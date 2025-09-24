@@ -1,192 +1,213 @@
----
-title: Create your first build
-description: Learn how to create a build for your app with EAS Build.
----
-
-import { Collapsible } from '~/ui/components/Collapsible';
-import { Terminal } from '~/ui/components/Snippet';
-import { Step } from '~/ui/components/Step';
-import { Tabs, Tab } from '~/ui/components/Tabs';
-import { A } from '~/ui/components/Text';
-
-EAS Build allows you to build a ready-to-submit binary of your app for the Google Play Store or Apple App Store. In this guide, let's learn how to do that.
-
-Alternatively, if you prefer to install the app directly to your Android device/emulator or install it in the iOS Simulator, we will point you toward resources that explain how to do that.
-
-For a small app, builds for Android and iOS platforms trigger within a few minutes. If you encounter any issues along the way, you can reach out on <A href="https://chat.expo.dev/" shouldLeakReferrer>Discord and Forums</A>.
-
-## Prerequisites
-
-EAS Build is a rapidly evolving service. Before you set out to create a build for your project we recommend consulting the [limitations](/build-reference/limitations) page and the other prerequisites below.
-
-<Collapsible summary="A React Native Android and/or iOS project that you want to build">
-
-Don't have a project yet? No problem. It's quick and easy to create a "Hello world" app that you can use with this guide.
-
-Run the following command to create a new project:
-
-<Terminal cmd={['$ npx create-expo-app my-app']} />
-
-EAS Build also works well with projects created by `npx create-react-native-app`, `npx react-native`, `ignite-cli`, and other project bootstrapping tools.
-
-</Collapsible>
-
-<Collapsible summary="An Expo user account">
-
-EAS Build is available to anyone with an Expo account, regardless of whether you pay for EAS or use our Free plan. You can sign up at [https://expo.dev/signup](https://expo.dev/signup).
-
-Paid subscribers get quality improvements such as additional build concurrencies, priority access to minimize the time your builds spend queueing, and increased limits on build timeouts. Learn more about different plans and benefits at [EAS pricing](https://expo.dev/pricing).
-
-</Collapsible>
-
-<Step label="1">
-## Install the latest EAS CLI
-
-EAS CLI is the command-line app that you will use to interact with EAS services from your terminal. To install it, run the command:
-
-<Terminal cmd={['$ npm install -g eas-cli']} />
-
-You can also use the above command to check if a new version of EAS CLI is available. We encourage you to always stay up to date with the latest version.
-
-> We recommend using `npm` instead of `yarn` for global package installations. You may alternatively use `npx eas-cli@latest`. Remember to use that instead of `eas` whenever it's called for in the documentation.
-
-</Step>
-
-<Step label="2">
-## Log in to your Expo account
-
-If you are already signed in to an Expo account using Expo CLI, you can skip the steps described in this section. If you are not, run the following command to log in:
-
-<Terminal cmd={['$ eas login']} />
-
-You can check whether you are logged in by running `eas whoami`.
-
-</Step>
-
-<Step label="3">
-## Configure the project
-
-To configure an Android or an iOS project for EAS Build, run the following command:
-
-<Terminal cmd={['$ eas build:configure']} />
-
-To learn more about what happens behind the scenes, see [build configuration process reference](/build-reference/build-configuration).
-
-For development, we recommend creating a [development build](/develop/development-builds/introduction/), which is a debug build of your app and contains the [`expo-dev-client`](/versions/latest/sdk/dev-client/) library. It helps you iterate as quickly as possible and provides a more flexible, reliable, and complete development environment. To install the library, run the following command:
-
-<Terminal cmd={['$ npx expo install expo-dev-client']} />
-
-Additional configuration may be required for some scenarios:
-
-- Does your app code depend on environment variables? [Add them to your build configuration](/build-reference/variables).
-- Is your project inside of a monorepo? [Follow these instructions](/build-reference/build-with-monorepos).
-- Do you use private npm packages? [Add your npm token](/build-reference/private-npm-packages).
-- Does your app depend on specific versions of tools like Node, Yarn, npm, CocoaPods, or Xcode? [Specify these versions in your build configuration](/build/eas-json).
-
-</Step>
-
-<Step label="4">
-## Run a build
-
-### Build for Android Emulator/device or iOS Simulator
-
-The easiest way to try out EAS Build is to create a build that you can run on your Android device/emulator or iOS Simulator. It's quicker than uploading it to a store, and you don't need store developer membership accounts. If you'd like to try this, read about [creating an installable APK for Android](/tutorial/eas/android-development-build/) and [creating a simulator build for iOS](/tutorial/eas/ios-development-build-for-simulators/).
-
-### Build for app stores
-
-Before the build process can start for app stores, you will need to have a store developer account and generate or provide app signing credentials.
-
-Whether you have experience with generating app signing credentials or not, EAS CLI does the heavy lifting. You can opt-in for EAS CLI to handle the app signing credentials process. Check out the steps for [Android app signing credentials](#android-app-signing-credentials) or [iOS app signing credentials](#ios-app-signing-credentials) process below for more information.
-
-<Collapsible summary="Google Play Developer membership is required to distribute to the Google Play Store.">
-
-You can build and sign your app using EAS Build, but you can't upload it to the Google Play Store unless you have a membership, a one-time $25 USD fee.
-
-</Collapsible>
-
-<Collapsible summary="Apple Developer Program membership is required to build for the Apple App Store.">
-
-If you are going to use EAS Build to create release builds for the Apple App Store, you need access to an account with a $99 USD [Apple Developer Program](https://developer.apple.com/programs) membership.
-
-</Collapsible>
-
-After you have confirmed that you have a Google Play Store or Apple App Store account and decided whether or not EAS CLI should handle app signing credentials, you can proceed with the following set of commands to build for the platform's store:
-
-<Tabs tabs={['Android', 'iOS']}>
-  <Tab>
-    <Terminal cmd={['$ eas build --platform android']} />
-  </Tab>
-  <Tab>
-    <Terminal cmd={['$ eas build --platform ios']} />
-  </Tab>
-</Tabs>
-
-> You can attach a message to the build by passing `--message` to the build command, for example, `eas build --platform ios --message "Some message"`. The message will appear on the website. It comes in handy when you want to leave a note with the purpose of the build for your team.
-
-Alternatively, you can use `--platform all` option to build for Android and iOS at the same time:
-
-<Terminal cmd={['$ eas build --platform all']} />
-
-> If you have released your app to stores previously and have existing [app signing credentials](/app-signing/app-credentials/) that you want to use, [follow these instructions to configure them](/app-signing/existing-credentials).
-
-#### Android app signing credentials
-
-- If you have not yet generated a keystore for your app, you can let EAS CLI take care of that for you by selecting `Generate new keystore`, and then you are done. The keystore is stored securely on EAS servers.
-- If you have previously built your app with `expo build:android`, you can use the same credentials here.
-- If you want to manually generate your keystore, see the [manual Android credentials guide](/app-signing/local-credentials#android-credentials) for more information.
-
-#### iOS app signing credentials
-
-- If you have not generated a provisioning profile and/or distribution certificate yet, you can let EAS CLI take care of that for you by signing into your Apple Developer Program account and following the prompts.
-- If you have already built your app with `expo build:ios`, you can use the same credentials here.
-- If you want to rather manually generate your credentials, refer to the [manual iOS credentials guide](/app-signing/local-credentials#ios-credentials) for more information.
-
-</Step>
-
-<Step label="5">
-## Wait for the build to complete
-
-By default, the `eas build` command will wait for your build to complete, but you can interrupt it if you prefer not to wait. Monitor the progress and read the logs by following the link to the build details page that EAS CLI prompts once the build process gets started. You can also find this page by visiting [your build dashboard](https://expo.dev/builds) or running the following command:
-
-<Terminal cmd={['$ eas build:list']} />
-
-If you are a member of an organization and your build is on its behalf, you will find the build details on [the build dashboard for that account](https://expo.dev/accounts/[account]/builds).
-
-> **Did your build fail?** Double check that you followed any applicable instructions in the [configuration step](#3-configure-the-project) and refer to the [troubleshooting guide](/build-reference/troubleshooting) if needed.
-
-</Step>
-
-<Step label="6">
-## Deploy the build
-
-If you have made it to this step, congratulations! Depending on which path you chose, you now either have a build that is ready to upload to an app store, or you have a build that you can install directly on an Android device/iOS Simulator.
-
-### Distribute your app to an app store
-
-You will only be able to submit to an app store if you built specifically for that purpose. If you created a build for a store, [learn how to submit your app to app stores with EAS Submit](/submit/introduction).
-
-### Install and run the app
-
-You will only be able to install the app directly to your Android device/iOS Simulator if you explicitly built it for that purpose. If you built for app store distribution, you will need to upload to an app store and then install it from there (for example, from Apple's TestFlight app).
-
-To learn how to install the app directly to your Android device/iOS Simulator, navigate to your build details page from [your build dashboard](https://expo.dev/accounts/[account]/builds) and click the "Install" button.
-
-</Step>
-
-## Next steps
-
-We walked you through the steps to create your first build with EAS Build without going into too much depth on any particular part of the process.
-
-When you are ready to learn more, we recommend proceeding through the following topics to learn more:
-
-- [Configuration with eas.json](/build/eas-json)
-- [Internal distribution](/build/internal-distribution)
-- [Updates](/build/updates)
-- [Automating submissions](/build/automate-submissions)
-- [Triggering builds from CI](/build/building-on-ci)
-
-You may also want to dig through the reference section to learn more about the topics that interest you most, such as:
-
-- [Build webhooks](/eas/webhooks)
-- [Build server infrastructure](/build-reference/infrastructure)
-- How the [Android](/build-reference/android-builds) and [iOS](/build-reference/ios-builds) build processes work
+import * as React from 'react';
+import { useState } from 'react';
+import { SafeAreaView, View, Text, TextInput, Pressable, FlatList, ScrollView, StyleSheet } from 'react-native';
+
+function Button({ title, onPress, variant='primary' }) {
+  return (
+    <Pressable onPress={onPress} style={[styles.btn, variant==='secondary' && styles.btnSecondary]}>
+      <Text style={[styles.btnText, variant==='secondary' && styles.btnTextSecondary]}>{title}</Text>
+    </Pressable>
+  );
+}
+
+function Tag({ text, color='#0ea5e9' }) {
+  return <Text style={[styles.tag, {borderColor: color, color}]}>{text}</Text>;
+}
+
+const currency = (n)=> `R$ ${n.toFixed(2).replace('.',',')}`;
+const gerarNumeroAIT = () => `AIT-ITA-${new Date().getFullYear()}-${Math.floor(Math.random()*900000+100000)}`;
+
+const seed = [
+  { id:'1', numero:gerarNumeroAIT(), placa:'ABC1D23', descricao:'Estacionar em local proibido', valor:195.23, status:'AUTUAÇÃO', quando:new Date() },
+  { id:'2', numero:gerarNumeroAIT(), placa:'XYZ9E88', descricao:'Avançar sinal vermelho', valor:293.47, status:'DEFESA', quando:new Date() },
+];
+
+function AppAgente({ onEmitido }) {
+  const [step, setStep] = useState(1);
+  const [placa, setPlaca] = useState('');
+  const [renavam, setRenavam] = useState('');
+  const [cnh, setCnh] = useState('');
+  const [desc, setDesc] = useState('Estacionar em local proibido');
+  const [valor, setValor] = useState('195.23');
+  const [gps, setGps] = useState(null);
+  const [evid, setEvid] = useState(0);
+
+  return (
+    <View style={{gap:12}}>
+      <Text style={styles.h2}>APP Agente — Emissão de AIT</Text>
+      {step===1 && (
+        <View style={{gap:8}}>
+          <Text>Placa</Text>
+          <TextInput style={styles.input} placeholder="ABC1D23" value={placa} onChangeText={(t)=>setPlaca(t.toUpperCase())}/>
+          <Text>RENAVAM</Text>
+          <TextInput style={styles.input} placeholder="00000000000" value={renavam} onChangeText={setRenavam}/>
+          <Text>CNH (se identificado)</Text>
+          <TextInput style={styles.input} placeholder="00000000000" value={cnh} onChangeText={setCnh}/>
+          <Text>Descrição</Text>
+          <TextInput style={[styles.input, {height:80}]} multiline value={desc} onChangeText={setDesc}/>
+          <Text>Valor</Text>
+          <TextInput style={styles.input} keyboardType="decimal-pad" value={valor} onChangeText={setValor}/>
+          <View style={styles.rowBetween}>
+            <Text style={{color:'#64748b'}}>{gps ? `GPS ok` : 'Sem localização'}</Text>
+            <Button title="Capturar GPS" variant="secondary" onPress={()=>setGps({lat:-4.276, lng:-55.992})}/>
+          </View>
+          <Button title="Próximo" onPress={()=>setStep(2)}/>
+        </View>
+      )}
+      {step===2 && (
+        <View style={{gap:8}}>
+          <View style={styles.rowGap}>
+            <Button title="Adicionar Foto" variant="secondary" onPress={()=>setEvid(e=>e+1)}/>
+            <Button title="Adicionar Vídeo" variant="secondary" onPress={()=>setEvid(e=>e+1)}/>
+          </View>
+          <Text style={{color:'#64748b'}}>Evidências: {evid}</Text>
+          <View style={styles.rowBetween}>
+            <Button title="Voltar" variant="secondary" onPress={()=>setStep(1)}/>
+            <Button title="Próximo" onPress={()=>setStep(3)}/>
+          </View>
+        </View>
+      )}
+      {step===3 && (
+        <View style={{gap:8}}>
+          <Text style={styles.h3}>Revisão</Text>
+          <Text>Placa: <Text style={styles.bold}>{placa || '—'}</Text></Text>
+          <Text>RENAVAM: <Text style={styles.bold}>{renavam || '—'}</Text></Text>
+          <Text>CNH: <Text style={styles.bold}>{cnh || '—'}</Text></Text>
+          <Text>Local: <Text style={styles.bold}>{gps ? 'Av. Belém, 123 - Centro' : '—'}</Text></Text>
+          <Text>Descrição: <Text style={styles.bold}>{desc}</Text></Text>
+          <Text>Valor: <Text style={styles.bold}>{currency(Number(valor||'0'))}</Text></Text>
+          <Text>Evidências: <Text style={styles.bold}>{evid}</Text></Text>
+          <View style={styles.rowBetween}>
+            <Button title="Voltar" variant="secondary" onPress={()=>setStep(2)}/>
+            <Button title="Emitir AIT" onPress={()=>{
+              onEmitido({
+                id: String(Math.random()),
+                numero: gerarNumeroAIT(),
+                placa: placa||'SEM-PLACA',
+                descricao: desc,
+                valor: Number(valor||'0'),
+                status: 'AUTUAÇÃO',
+                quando: new Date()
+              });
+              setStep(1); setPlaca(''); setRenavam(''); setCnh(''); setDesc('Estacionar em local proibido'); setValor('195.23'); setGps(null); setEvid(0);
+            }}/>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function Backoffice({ aits, onStatus }) {
+  return (
+    <View style={{gap:12}}>
+      <Text style={styles.h2}>Backoffice — Autos de Infração</Text>
+      <FlatList
+        data={aits}
+        keyExtractor={(i)=>i.id}
+        ItemSeparatorComponent={()=> <View style={{height:8}}/>}
+        renderItem={({item})=>(
+          <View style={styles.card}>
+            <Text style={styles.bold}>{item.numero}</Text>
+            <Text>{item.placa} — {item.descricao}</Text>
+            <View style={styles.rowBetween}>
+              <Tag text={item.status}/>
+              <View style={styles.rowGap}>
+                <Button title="Emitir NA" variant="secondary" onPress={()=>onStatus(item.id, 'PENALIDADE')}/>
+                <Button title="Julg. Defesa" variant="secondary" onPress={()=>onStatus(item.id, 'PENALIDADE')}/>
+              </View>
+            </View>
+          </View>
+        )}
+      />
+    </View>
+  );
+}
+
+function Portal({ aits }) {
+  const [q, setQ] = useState('');
+  const results = aits.filter(a => a.placa.toLowerCase().includes(q.toLowerCase()) || a.numero.toLowerCase().includes(q.toLowerCase()));
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <View style={{gap:12}}>
+      <Text style={styles.h2}>Portal do Cidadão</Text>
+      <TextInput style={styles.input} placeholder="ABC1D23 ou AIT-ITA-..." value={q} onChangeText={setQ}/>
+      <ScrollView style={{maxHeight: 220}}>
+        {results.map((a)=>(
+          <Pressable key={a.id} onPress={()=>setSelected(a)} style={[styles.card, selected?.id===a.id && {borderColor:'#0f766e'}]}>
+            <Text style={styles.bold}>{a.numero}</Text>
+            <Text style={{color:'#64748b'}}>{a.placa} — {a.quando.toLocaleDateString()}</Text>
+          </Pressable>
+        ))}
+        {results.length===0 && <Text style={{color:'#64748b'}}>Nenhum resultado</Text>}
+      </ScrollView>
+      {selected && (
+        <View style={styles.card}>
+          <Text style={styles.bold}>{selected.numero} — {selected.placa}</Text>
+          <Text>{selected.descricao}</Text>
+          <Text>Status: <Text style={styles.bold}>{selected.status}</Text></Text>
+          <Text>Valor: <Text style={styles.bold}>{currency(selected.valor)}</Text></Text>
+          <View style={styles.rowGap}>
+            <Button title="PIX (exemplo)" variant="secondary" onPress={()=>{}}/>
+            <Button title="Boleto (exemplo)" variant="secondary" onPress={()=>{}}/>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+export default function App() {
+  const [tab, setTab] = useState('agente');
+  const [aits, setAits] = useState(seed);
+
+  const handleEmitido = (ait) => setAits(prev => [ait, ...prev]);
+  const handleStatus = (id, novo) => setAits(prev => prev.map(a => a.id===id ? {...a, status: novo} : a));
+
+  return (
+    <SafeAreaView style={{flex:1}}>
+      <View style={styles.topbar}>
+        <Text style={styles.topbarTitle}>COTRAN — Itaituba</Text>
+        <Text style={styles.topbarSub}>Protótipo • Multas</Text>
+      </View>
+
+      <View style={{padding:16, gap:16, flex:1}}>
+        <View style={styles.tabs}>
+          <Pressable onPress={()=>setTab('agente')} style={[styles.tabBtn, tab==='agente' && styles.tabBtnActive]}><Text style={[styles.tabText, tab==='agente'&&styles.tabTextActive]}>APP Agente</Text></Pressable>
+          <Pressable onPress={()=>setTab('backoffice')} style={[styles.tabBtn, tab==='backoffice' && styles.tabBtnActive]}><Text style={[styles.tabText, tab==='backoffice'&&styles.tabTextActive]}>Backoffice</Text></Pressable>
+          <Pressable onPress={()=>setTab('portal')} style={[styles.tabBtn, tab==='portal' && styles.tabBtnActive]}><Text style={[styles.tabText, tab==='portal'&&styles.tabTextActive]}>Portal</Text></Pressable>
+        </View>
+
+        <ScrollView contentContainerStyle={{paddingBottom:24}}>
+          {tab==='agente' && <AppAgente onEmitido={handleEmitido} />}
+          {tab==='backoffice' && <Backoffice aits={aits} onStatus={handleStatus} />}
+          {tab==='portal' && <Portal aits={aits} />}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  topbar:{backgroundColor:'#0f766e', padding:16},
+  topbarTitle:{color:'#fff', fontSize:18, fontWeight:'700'},
+  topbarSub:{color:'#d1fae5', fontSize:12},
+  h2:{fontSize:18, fontWeight:'700'},
+  h3:{fontSize:16, fontWeight:'700'},
+  input:{borderWidth:1, borderColor:'#cbd5e1', borderRadius:8, padding:10, backgroundColor:'#fff'},
+  btn:{backgroundColor:'#0ea5e9', paddingVertical:10, paddingHorizontal:14, borderRadius:10, alignSelf:'flex-start'},
+  btnText:{color:'#fff', fontWeight:'700'},
+  btnSecondary:{backgroundColor:'#fff', borderWidth:1, borderColor:'#0ea5e9'},
+  btnTextSecondary:{color:'#0ea5e9'},
+  rowBetween:{flexDirection:'row', alignItems:'center', justifyContent:'space-between'},
+  rowGap:{flexDirection:'row', gap:8},
+  tag:{borderWidth:1, paddingHorizontal:8, paddingVertical:4, borderRadius:999, fontSize:12},
+  bold:{fontWeight:'700'},
+  card:{borderWidth:1, borderColor:'#cbd5e1', borderRadius:12, padding:12, backgroundColor:'#fff', marginBottom:8},
+  tabs:{flexDirection:'row', backgroundColor:'#e2e8f0', borderRadius:10, overflow:'hidden'},
+  tabBtn:{flex:1, padding:10, alignItems:'center'},
+  tabBtnActive:{backgroundColor:'#0f766e'},
+  tabText:{color:'#334155', fontWeight:'700'},
+  tabTextActive:{color:'#fff'}
+});
